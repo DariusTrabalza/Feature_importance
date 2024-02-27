@@ -6,10 +6,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
+import seaborn as sns
 
 def main():
     '''
-    Pre Processes data and trains random forest tree model, then visualises importance of features.
+    Pre-processes data and trains random forest tree model, then visualises importance of features.
     '''
 
     df = import_and_clean()
@@ -17,14 +18,14 @@ def main():
     X_train_scaled,X_test_scaled = scale_features(X_train,X_test)
     clf = train_model(X_train_scaled, y_train)
     y_pred = predictions(X_test_scaled, clf)
-    feature_importance_df = evaluations(y_test, y_pred, clf, X) 
-    visualisations(feature_importance_df)
+    feature_importance_df,conf_matrix = evaluations(y_test, y_pred, clf, X) 
+    visualisations(feature_importance_df,conf_matrix)
     print(df.head())
     
 def import_and_clean():
     '''
-    Imports file named "clean_data.csv" as a pd df. Returning print message for any errors that may occur at this stage.
-    Also checks for null data and prints a message if identified. Removes unneeded column and adds new column that will 
+    Imports the file named "clean_data.csv" as a pandas DataFrame. Returning print messages for any errors that may occur at this stage.
+    Also checks for null data and prints a message if identified. Removes un-needed columns and adds a new column that will 
     be the target column called "classification" based on column "net_change".
 
     Returns:
@@ -145,6 +146,7 @@ def evaluations(y_test, y_pred, clf, X):
 
     Returns:
         feature_importance_df : A dataframe of showing how much each feature contributed to the probability
+        conf_matrix : A confusion matrix of the results
     '''
 
     precision = precision_score(y_test, y_pred)
@@ -156,17 +158,15 @@ def evaluations(y_test, y_pred, clf, X):
     print(f'F1 Score: {f1}')
 
     # Generate and print the confusion matrix
-
     conf_matrix = confusion_matrix(y_test, y_pred)
-    print(conf_matrix)
+    
 
     #check feature importance
-
     feature_importances = clf.feature_importances_
     feature_importance_df = pd.DataFrame({'Feature': X.columns, 'Importance': feature_importances})
     feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
 
-        #printing feature importance
+    #printing feature importance
     importances = clf.feature_importances_
     feature_names = X.columns 
     feature_importances = zip(feature_names, importances)
@@ -174,10 +174,10 @@ def evaluations(y_test, y_pred, clf, X):
     for feature, importance in sorted_feature_importances:
         print(f"{feature}: {importance}")
 
-    return feature_importance_df
+    return feature_importance_df,conf_matrix
 
 
-def visualisations(feature_importance_df):
+def visualisations(feature_importance_df,conf_matrix):
     '''
     Creates a bar plot to visualise the order of importance of the features in the predictions the trained model made
 
@@ -191,6 +191,12 @@ def visualisations(feature_importance_df):
     plt.ylabel('Feature')
     plt.show()
 
+
+    sns.heatmap(conf_matrix, annot = True, cmap = "Blues", fmt ="g")
+    plt.xlabel("Predicted Labels")
+    plt.ylabel("Actual Labels")
+    plt.title("Results Heatmap")
+    plt.show()
 
 
 
