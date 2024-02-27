@@ -17,5 +17,5 @@ which features of the data set used are contribute the most to making an accurat
 To install and run this project, follow these steps:
 
 1. Clone the repository:
-   ```sh
-   git clone [Your Repository URL]
+   
+   git clone [https://github.com/DariusTrabalza/Feature_importance/tree/main]
